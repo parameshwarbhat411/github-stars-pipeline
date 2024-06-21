@@ -2,7 +2,7 @@ version: 2
 
 sources:
   - name: gharchive
-    database: file
     schema: source
+    database: file
     tables:
       - name: src_gharchive

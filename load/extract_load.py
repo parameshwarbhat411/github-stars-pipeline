@@ -4,8 +4,8 @@ import tempfile
 import os
 import duckdb
 from datetime import datetime
-import logging
-
+import logging as logger
+import glob
 
 class ExtractLoad:
     def __init__(self, db_path):
@@ -22,12 +22,19 @@ class ExtractLoad:
                     with open(dest_file, 'wb') as f_out:
                         shutil.copyfileobj(f_in, f_out)
 
+        json_files = glob.glob(f"{tmp_dir_name}/*.json")
+
+        # Count the number of JSON files
+        num_json_files = len(json_files)
+
+        logger.info(f"Number of JSON files: {num_json_files} in {tmp_dir_name}")
+
         con = duckdb.connect(self.db_path)
         con.execute("CREATE SCHEMA IF NOT EXISTS source")
-        logging.info("Performing initial load...")
+        logger.info("Performing initial load...")
         # Initial load: load all JSON files
         con.execute(f"""
-        CREATE TABLE source.src_gharchive AS 
+        CREATE TABLE source.src_gharchive AS
         SELECT *, NOW() AS loaded_at FROM read_json_auto('{tmp_dir_name}/*.json')
         """)
         con.close()
@@ -35,7 +42,7 @@ class ExtractLoad:
     def incremental_load(self, source_dir, tmp_dir_name):
         con = duckdb.connect(self.db_path)
         con.execute("CREATE SCHEMA IF NOT EXISTS source")
-        logging.info("Performing incremental load...")
+        logger.info("Performing incremental load...")
 
         # Incremental load: load only new JSON files
         result = con.execute("SELECT MAX(loaded_at) FROM source.src_gharchive").fetchone()
@@ -55,7 +62,7 @@ class ExtractLoad:
 
                         with gzip.open(source_file, 'rb') as f_in, open(dest_file, 'wb') as f_out:
                             shutil.copyfileobj(f_in, f_out)
-                            logging.info(f'Unzipped {filename} to {dest_file}')
+                            logger.info(f'Unzipped {filename} to {dest_file}')
 
                         # Insert new data into the table
                         con.execute(f"""
@@ -63,7 +70,7 @@ class ExtractLoad:
                         SELECT *, NOW() AS loaded_at FROM read_json_auto('{dest_file}')
                         """)
                 except Exception as e:
-                    logging.error(f"Error processing file {filename}: {e}")
+                    logger.error(f"Error processing file {filename}: {e}")
         con.close()
 
     def load_json(self, source_dir):
@@ -72,7 +79,7 @@ class ExtractLoad:
                 raise FileNotFoundError(f"Source directory not found: {source_dir}")
 
             with tempfile.TemporaryDirectory() as tmp_dir_name:
-                logging.info(f'Created temporary directory: {tmp_dir_name}')
+                logger.info(f'Created temporary directory: {tmp_dir_name}')
 
                 con = duckdb.connect(self.db_path)
 
@@ -91,4 +98,4 @@ class ExtractLoad:
                     self.incremental_load(source_dir, tmp_dir_name)
 
         except duckdb.FatalException as e:
-            logging.error(e)
+            logger.error(e)
