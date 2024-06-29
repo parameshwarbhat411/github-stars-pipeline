@@ -1,0 +1,21 @@
+FROM python:3.10-slim
+
+WORKDIR /app
+
+COPY requirements.txt requirements.txt
+RUN pip install -r requirements.txt
+
+COPY . .
+
+RUN apt-get update && apt-get install -y unzip
+RUN unzip data/gharchive_sample.zip -d data/
+
+# Create .dbt directory and copy the profiles.yml with the correct path
+RUN mkdir -p /root/.dbt
+COPY profiles.yml /root/.dbt/profiles.yml
+
+# Set environment variable to indicate Docker environment
+ENV DBT_DB_PATH=/app/file.db
+
+# Run the main.py script and then run dbt models
+CMD ["sh", "-c", "python main.py && cd transform && dbt run && cp ../file.db /app/data/"]

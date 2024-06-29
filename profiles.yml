@@ -1,0 +1,6 @@
+github_stars:
+  outputs:
+    local:
+      type: duckdb
+      path: "{{ env_var('DBT_DB_PATH', '/Users/arjunbhat/github-stars-pipeline/file.db') }}"
+  target: local

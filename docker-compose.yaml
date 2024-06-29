@@ -1,0 +1,47 @@
+version: '3.8'
+
+services:
+  data_processing:
+    build:
+      context: .
+      dockerfile: Dockerfile.data_processing
+    volumes:
+      - data_volume:/app/data
+    environment:
+      - DATA_PATH=/app/data/gharchive_sample
+
+  flask_backend:
+    build:
+      context: .
+      dockerfile: Dockerfile.flask_backend
+    volumes:
+      - data_volume:/app/data
+    ports:
+      - "5001:5001"
+    environment:
+      - DB_PATH=/app/data/file.db
+    depends_on:
+      - data_processing
+    networks:
+      - my_network
+
+  streamlit_app:
+    build:
+      context: .
+      dockerfile: Dockerfile.streamlit_app
+    volumes:
+      - data_volume:/app/data
+    ports:
+      - "8501:8501"
+    environment:
+      - FLASK_BACKEND_URL=http://flask_backend:5001
+    depends_on:
+      - flask_backend
+    networks:
+      - my_network
+
+volumes:
+  data_volume:
+
+networks:
+  my_network:

@@ -1,0 +1,11 @@
+# Dockerfile.streamlit_app for data processing and dbt
+FROM python:3.10-slim
+
+WORKDIR /app
+
+COPY requirements.txt .
+RUN pip install -r requirements.txt
+
+COPY stream.py .
+
+CMD ["streamlit", "run", "stream.py"]

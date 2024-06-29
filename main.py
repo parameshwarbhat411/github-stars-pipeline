@@ -5,8 +5,9 @@ import os
 logging.config.fileConfig('temp.conf')
 
 if __name__ == '__main__':
-    # Get the data path
-    data_path = os.path.join(os.getcwd(), 'data/gharchive_sample')
+
+    # Get the data path from environment variable
+    data_path = os.getenv('DATA_PATH', 'data/gharchive_sample')
     logging.info(f"Data Path: {data_path}")
 
     # Initialize ExtractLoad object
