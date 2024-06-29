@@ -1,0 +1,1 @@
+{{ fact_event_type_weekly('fact_stars', 'stars_count', 'starsCount', 'last_week_star_count') }}

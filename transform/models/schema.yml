@@ -1,0 +1,6 @@
+models:
+  - name: dim_repos
+    columns:
+      - name: repo_id
+        data_tests:
+          - not_null

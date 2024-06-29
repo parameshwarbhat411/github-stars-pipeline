@@ -1,0 +1,1 @@
+{{ fact_event_type_weekly('fact_commits', 'commits_count', 'commitsCount', 'last_week_commit_count') }}

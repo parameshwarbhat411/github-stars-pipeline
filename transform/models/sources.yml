@@ -1,0 +1,8 @@
+version: 2
+
+sources:
+  - name: gharchive
+    schema: source
+    database: file
+    tables:
+      - name: src_gharchive

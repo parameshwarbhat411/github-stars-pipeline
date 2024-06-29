@@ -1,0 +1,1 @@
+{{ fact_event_type_monthly('fact_stars', 'star_count', 'last_year_star_count') }}

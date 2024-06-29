@@ -1,0 +1,1 @@
+{{ fact_event_type_monthly('fact_commits', 'commits_count', 'last_year_commit_count') }}
